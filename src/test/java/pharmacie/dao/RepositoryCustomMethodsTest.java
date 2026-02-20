@@ -61,7 +61,8 @@ class RepositoryCustomMethodsTest {
         m1.setUnitesCommandees(50);
         m1 = medicamentRepository.saveAndFlush(m1); // Capture updated entity
         Integer m1Id = m1.getReference(); // Capture ID for lambda use if needed, or use m1 if it was not reassigned.
-        // Wait, m1 IS reassigned here, so it's not effectively final for the lambda below.
+        // Wait, m1 IS reassigned here, so it's not effectively final for the lambda
+        // below.
 
         Medicament m2 = new Medicament();
         m2.setNom("Med2");
@@ -86,8 +87,11 @@ class RepositoryCustomMethodsTest {
         assertTrue(m1Found, "Med1 should be in the available list");
 
         // Check if m2 is NOT in the list
-        // boolean m2Found = disponibles.stream().anyMatch(m -> m.getReference().equals(m2.getReference())); // m2 reference might be null if not captured? No, saveAndFlush updates it.
-        // Actually I didn't capture m2 return. Let's assume database ID generation works and references are distinct.
+        // boolean m2Found = disponibles.stream().anyMatch(m ->
+        // m.getReference().equals(m2.getReference())); // m2 reference might be null if
+        // not captured? No, saveAndFlush updates it.
+        // Actually I didn't capture m2 return. Let's assume database ID generation
+        // works and references are distinct.
         // But safer to check by name if ID not handy, or just rely on logic validation.
         // Given data.sql, exact count check is flaky.
         // Verify at least one exists
@@ -95,7 +99,8 @@ class RepositoryCustomMethodsTest {
 
         // Setup stats for medicamentsCommandesPour
         Dispensaire d = new Dispensaire();
-        d.setCode("D1"); d.setNom("D");
+        d.setCode("D1");
+        d.setNom("D");
         d = dispensaireRepository.saveAndFlush(d);
 
         Commande cmd = new Commande();
@@ -103,13 +108,19 @@ class RepositoryCustomMethodsTest {
         cmd = commandeRepository.saveAndFlush(cmd);
 
         Ligne l1 = new Ligne();
-        l1.setCommande(cmd); l1.setMedicament(m1); l1.setQuantite(5);
+        l1.setCommande(cmd);
+        l1.setMedicament(m1);
+        l1.setQuantite(5);
         ligneRepository.saveAndFlush(l1);
 
         Ligne l2 = new Ligne();
-        l2.setCommande(cmd); l2.setMedicament(m1); l2.setQuantite(3);
-        // Another line for same medicament (usually unique constarint prevents this on same command, but let's say different commands or just testing aggregation)
-        // Wait, current constraint is (commande, medicament). So we need another command for l2 testing aggregation if we want m1 to show up with sum of 8
+        l2.setCommande(cmd);
+        l2.setMedicament(m1);
+        l2.setQuantite(3);
+        // Another line for same medicament (usually unique constarint prevents this on
+        // same command, but let's say different commands or just testing aggregation)
+        // Wait, current constraint is (commande, medicament). So we need another
+        // command for l2 testing aggregation if we want m1 to show up with sum of 8
         Commande cmd2 = new Commande();
         cmd2.setDispensaire(d);
         cmd2 = commandeRepository.saveAndFlush(cmd2);
@@ -183,17 +194,17 @@ class RepositoryCustomMethodsTest {
 
         // Verify Aspirine: 10 + 15 = 25 units
         UnitesParMedicament aspirin = stats.stream()
-            .filter(s -> "Aspirine".equals(s.getNom()))
-            .findFirst()
-            .orElse(null);
+                .filter(s -> "Aspirine".equals(s.getNom()))
+                .findFirst()
+                .orElse(null);
         assertNotNull(aspirin, "Aspirine should be in the results");
         assertEquals(25L, aspirin.getUnites());
 
         // Verify Paracetamol: 5 units
         UnitesParMedicament paracetamol = stats.stream()
-            .filter(s -> "Paracetamol".equals(s.getNom()))
-            .findFirst()
-            .orElse(null);
+                .filter(s -> "Paracetamol".equals(s.getNom()))
+                .findFirst()
+                .orElse(null);
         assertNotNull(paracetamol, "Paracetamol should be in the results");
         assertEquals(5L, paracetamol.getUnites());
     }
@@ -207,6 +218,7 @@ class RepositoryCustomMethodsTest {
 
         Commande c1 = new Commande();
         c1.setDispensaire(d);
+        c1.setEnvoyeele(LocalDate.now()); // La requête filtre sur envoyeele IS NOT NULL
         c1 = commandeRepository.saveAndFlush(c1);
 
         Categorie cat = new Categorie();
@@ -214,20 +226,27 @@ class RepositoryCustomMethodsTest {
         cat = categorieRepository.saveAndFlush(cat);
 
         Medicament m = new Medicament();
-        m.setNom("Med"); m.setCategorie(cat);
+        m.setNom("Med");
+        m.setCategorie(cat);
         m = medicamentRepository.saveAndFlush(m);
 
         Ligne l1 = new Ligne();
-        l1.setCommande(c1); l1.setMedicament(m); l1.setQuantite(10);
+        l1.setCommande(c1);
+        l1.setMedicament(m);
+        l1.setQuantite(10);
         ligneRepository.saveAndFlush(l1);
 
         Ligne l2 = new Ligne();
-        l2.setCommande(c1); l2.setMedicament(m); l2.setQuantite(20);
+        l2.setCommande(c1);
+        l2.setMedicament(m);
+        l2.setQuantite(20);
         // Note: constraint prevents l2 on same command/medicament?
-        // Ah, constraint is unique (commande, medicament). So we need separate medicament or separate command.
+        // Ah, constraint is unique (commande, medicament). So we need separate
+        // medicament or separate command.
 
         Commande c2 = new Commande();
         c2.setDispensaire(d);
+        c2.setEnvoyeele(LocalDate.now()); // La requête filtre sur envoyeele IS NOT NULL
         c2 = commandeRepository.saveAndFlush(c2);
 
         l2.setCommande(c2);
@@ -272,29 +291,33 @@ class RepositoryCustomMethodsTest {
 
     @Test
     void testLigneCustomMethods() {
-         Categorie cat = new Categorie();
-         cat.setLibelle("LigneCat");
-         cat = categorieRepository.saveAndFlush(cat);
+        Categorie cat = new Categorie();
+        cat.setLibelle("LigneCat");
+        cat = categorieRepository.saveAndFlush(cat);
 
-         Medicament m = new Medicament();
-         m.setNom("LigneMed"); m.setCategorie(cat);
-         m = medicamentRepository.saveAndFlush(m);
+        Medicament m = new Medicament();
+        m.setNom("LigneMed");
+        m.setCategorie(cat);
+        m = medicamentRepository.saveAndFlush(m);
 
-         Dispensaire d = new Dispensaire();
-         d.setCode("L_D"); d.setNom("LigneDisp");
-         d = dispensaireRepository.saveAndFlush(d);
+        Dispensaire d = new Dispensaire();
+        d.setCode("L_D");
+        d.setNom("LigneDisp");
+        d = dispensaireRepository.saveAndFlush(d);
 
-         Commande c = new Commande();
-         c.setDispensaire(d);
-         c = commandeRepository.saveAndFlush(c);
+        Commande c = new Commande();
+        c.setDispensaire(d);
+        c = commandeRepository.saveAndFlush(c);
 
-         Ligne l = new Ligne();
-         l.setCommande(c); l.setMedicament(m); l.setQuantite(99);
-         ligneRepository.saveAndFlush(l);
+        Ligne l = new Ligne();
+        l.setCommande(c);
+        l.setMedicament(m);
+        l.setQuantite(99);
+        ligneRepository.saveAndFlush(l);
 
-         // findByCommandeAndMedicament
-         Optional<Ligne> found = ligneRepository.findByCommandeAndMedicament(c, m);
-         assertTrue(found.isPresent());
-         assertEquals(99, found.get().getQuantite());
+        // findByCommandeAndMedicament
+        Optional<Ligne> found = ligneRepository.findByCommandeAndMedicament(c, m);
+        assertTrue(found.isPresent());
+        assertEquals(99, found.get().getQuantite());
     }
 }
