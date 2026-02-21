@@ -31,6 +31,11 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // Ne pas réinsérer si les données existent déjà
+        if (fournisseurRepository.count() > 0) {
+            System.out.println("=== DataInitializer : données déjà présentes, skip ===");
+            return;
+        }
         System.out.println("=== Initialisation des données (DataInitializer) ===");
 
         Fournisseur pfizer = new Fournisseur("Pfizer");

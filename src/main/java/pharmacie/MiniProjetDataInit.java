@@ -31,6 +31,11 @@ public class MiniProjetDataInit implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        // Ne pas réinsérer si les données existent déjà
+        if (medicamentRepository.count() > 0) {
+            System.out.println("=== MiniProjetDataInit : données déjà présentes, skip ===");
+            return;
+        }
         System.out.println("=== Initialisation des données MiniProjet ===");
 
         Fournisseur laboA = new Fournisseur("Labo A");
