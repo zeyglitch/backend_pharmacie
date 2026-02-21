@@ -1,0 +1,16 @@
+target/
+.git/
+.gitignore
+.env
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+doc/
+README.md
+HELP.md
+derby.log
+*.md
+!src/**/*.md
