@@ -44,6 +44,7 @@ public class Categorie {
 
 	@ManyToMany
 	@JoinTable(name = "categorie_fournisseur", joinColumns = @JoinColumn(name = "categorie_code"), inverseJoinColumns = @JoinColumn(name = "fournisseur_id"))
+	@JsonIgnoreProperties({ "categories" }) // pour éviter la boucle infinie en JSON
 	private Set<Fournisseur> fournisseurs = new HashSet<>();
 
 }

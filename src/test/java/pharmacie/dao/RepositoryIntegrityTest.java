@@ -9,10 +9,11 @@ import pharmacie.entity.*;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 /**
- * Un jeu de tests vérifiant l'intégrité des données dans la base de données
- * Note : Les contraintes d'intégrité au moment où on enregistre les objets dans la BD.
- * Pour forcer l'enregistrement, on utilise saveAndFlush() au lieu de save(), deleteAndFlush() au lieu de delete()
+ * Tests d'intégrité des données dans la base.
+ * On utilise saveAndFlush() pour forcer l'écriture en BD
+ * et déclencher les contraintes.
  */
 @DataJpaTest
 class RepositoryIntegrityTest {
@@ -30,18 +31,19 @@ class RepositoryIntegrityTest {
 
     @Test
     void unMedicamentSansCategorieEstInterdit() {
-        // Try to save Medicament without Categorie
+        // On essaie de sauvegarder un médicament sans catégorie
         Medicament m = new Medicament();
         m.setNom("Doliprane");
 
+        // Ca doit planter car categorie_code est NOT NULL
         assertThrows(DataIntegrityViolationException.class, () -> {
             medicamentRepository.saveAndFlush(m);
-        }, "Should not save Medicament without Categorie");
+        });
     }
 
     @Test
     void detruireLaCategorieSupprimeSesMedicaments() {
-        // Cascade Delete Categorie -> Medicament
+        // On crée une catégorie avec un médicament
         Categorie c = new Categorie();
         c.setLibelle("Antalgiques");
 
@@ -49,37 +51,40 @@ class RepositoryIntegrityTest {
         m.setNom("Doliprane");
         m.setCategorie(c);
 
-        // Use parent cascade
+        // On ajoute le médicament dans la liste de la catégorie (cascade)
         c.getMedicaments().add(m);
 
+        // On sauvegarde la catégorie, le médicament est créé par cascade
         c = categorieRepository.saveAndFlush(c);
         m = c.getMedicaments().get(0);
+        Integer reference = m.getReference();
 
-        var reference = m.getReference();
+        assertNotNull(reference, "Le médicament doit avoir une référence auto-générée");
 
-        assertNotNull(reference, "Medicament should be saved via cascade");
-
+        // On supprime la catégorie
         categorieRepository.delete(c);
         categorieRepository.flush();
 
-        Optional<Medicament> found = medicamentRepository.findById(reference);
-        assertFalse(found.isPresent(), "Medicament should be deleted when Categorie is deleted");
+        // Le médicament doit avoir été supprimé aussi (CascadeType.ALL)
+        Optional<Medicament> resultat = medicamentRepository.findById(reference);
+        assertFalse(resultat.isPresent(), "Le médicament doit être supprimé avec sa catégorie");
     }
 
     @Test
     void uneCommandeSansDispensaireEstInterdite() {
-        // Try to save Commande without Dispensaire
+        // On essaie de créer une commande sans dispensaire
         Commande commande = new Commande();
         commande.setDestinataire("Mr Smith");
 
+        // Ca doit planter car dispensaire_code est NOT NULL
         assertThrows(DataIntegrityViolationException.class, () -> {
             commandeRepository.saveAndFlush(commande);
-        }, "Should not save Commande without Dispensaire");
+        });
     }
 
     @Test
     void detruireLeDispensaireSupprimeSesCommandes() {
-        // Cascade Delete Dispensaire -> Commande
+        // On crée un dispensaire avec une commande
         Dispensaire d = new Dispensaire();
         d.setCode("D001");
         d.setNom("Dispensaire Central");
@@ -88,36 +93,39 @@ class RepositoryIntegrityTest {
         commande.setDestinataire("Mr Smith");
         commande.setDispensaire(d);
 
-        // Use parent cascade
+        // On ajoute la commande dans la liste du dispensaire (cascade)
         d.getCommandes().add(commande);
 
         d = dispensaireRepository.saveAndFlush(d);
         commande = d.getCommandes().get(0);
+        Integer numero = commande.getNumero();
 
-        assertNotNull(commande.getNumero(), "Commande should be saved via cascade");
+        assertNotNull(numero, "La commande doit avoir un numéro auto-généré");
 
+        // On supprime le dispensaire
         dispensaireRepository.delete(d);
         dispensaireRepository.flush();
-        var numero = commande.getNumero();
 
-        Optional<Commande> found = commandeRepository.findById(numero);
-        assertFalse(found.isPresent(), "Commande should be deleted when Dispensaire is deleted");
+        // La commande doit être supprimée aussi (CascadeType.ALL)
+        Optional<Commande> resultat = commandeRepository.findById(numero);
+        assertFalse(resultat.isPresent(), "La commande doit être supprimée avec son dispensaire");
     }
 
     @Test
     void uneLigneSansCommandeOuMedicamentEstInterdite() {
-        // Try to save Ligne without Commande/Medicament
-        Ligne l1 = new Ligne();
-        l1.setQuantite(10);
+        // On essaie de créer une ligne sans commande ni médicament
+        Ligne ligne = new Ligne();
+        ligne.setQuantite(10);
 
+        // Ca doit planter car commande_numero et medicament_reference sont NOT NULL
         assertThrows(DataIntegrityViolationException.class, () -> {
-            ligneRepository.saveAndFlush(l1);
+            ligneRepository.saveAndFlush(ligne);
         });
     }
 
     @Test
     void medicamentDupliqueDansUneMemeCommandeEstInterdit() {
-        // Setup via repositories preferably
+        // On prépare les données de base
         Categorie cat = new Categorie();
         cat.setLibelle("Test Cat");
         cat = categorieRepository.saveAndFlush(cat);
@@ -136,26 +144,28 @@ class RepositoryIntegrityTest {
         cmd.setDispensaire(d);
         cmd = commandeRepository.saveAndFlush(cmd);
 
-        // Unique Constraint (Commande, Medicament)
-        Ligne l2 = new Ligne();
-        l2.setCommande(cmd);
-        l2.setMedicament(med);
-        l2.setQuantite(5);
-        ligneRepository.saveAndFlush(l2);
+        // Première ligne : on met le médicament dans la commande
+        Ligne ligne1 = new Ligne();
+        ligne1.setCommande(cmd);
+        ligne1.setMedicament(med);
+        ligne1.setQuantite(5);
+        ligneRepository.saveAndFlush(ligne1);
 
-        Ligne l3Duplicate = new Ligne();
-        l3Duplicate.setCommande(cmd);
-        l3Duplicate.setMedicament(med);
-        l3Duplicate.setQuantite(2);
+        // Deuxième ligne : même commande + même médicament = interdit !
+        // (contrainte d'unicité sur (commande_numero, medicament_reference))
+        Ligne ligneDupliquee = new Ligne();
+        ligneDupliquee.setCommande(cmd);
+        ligneDupliquee.setMedicament(med);
+        ligneDupliquee.setQuantite(2);
 
         assertThrows(DataIntegrityViolationException.class, () -> {
-            ligneRepository.saveAndFlush(l3Duplicate);
-        }, "Should not allow duplicate lines for same Commande and Medicament");
+            ligneRepository.saveAndFlush(ligneDupliquee);
+        });
     }
 
     @Test
     void testOrphanRemovalLigne() {
-        // Setup
+        // On prépare les données de base
         Categorie cat = new Categorie();
         cat.setLibelle("Orphan Cat");
         cat = categorieRepository.saveAndFlush(cat);
@@ -173,43 +183,48 @@ class RepositoryIntegrityTest {
         Commande cmd = new Commande();
         cmd.setDispensaire(d);
 
-        Ligne l = new Ligne();
-        l.setCommande(cmd);
-        l.setMedicament(med);
-        l.setQuantite(1);
+        // On crée une ligne et on l'ajoute à la commande
+        Ligne ligne = new Ligne();
+        ligne.setCommande(cmd);
+        ligne.setMedicament(med);
+        ligne.setQuantite(1);
+        cmd.getLignes().add(ligne);
 
-        // Add to collection
-        cmd.getLignes().add(l);
-
+        // On sauvegarde la commande, la ligne est créée par cascade
         cmd = commandeRepository.saveAndFlush(cmd);
 
-        Ligne persistedLigne = cmd.getLignes().get(0);
-        Integer ligneId = persistedLigne.getId();
+        Ligne ligneSauvee = cmd.getLignes().get(0);
+        Integer ligneId = ligneSauvee.getId();
         assertNotNull(ligneId);
 
-        // Remove from collection
-        cmd.getLignes().remove(persistedLigne);
-
+        // On retire la ligne de la collection
+        cmd.getLignes().remove(ligneSauvee);
         commandeRepository.saveAndFlush(cmd);
 
-        Optional<Ligne> found = ligneRepository.findById(ligneId);
-        assertFalse(found.isPresent(), "Ligne should be deleted when removed from Commande's list (orphanRemoval)");
+        // Grâce à orphanRemoval=true, la ligne doit être supprimée de la BD
+        Optional<Ligne> resultat = ligneRepository.findById(ligneId);
+        assertFalse(resultat.isPresent(), "La ligne orpheline doit être supprimée automatiquement");
     }
 
     @Test
     void neDetruitPasUneCategorieSiSesMedicamentsSontCommandes() {
+        // On récupère la catégorie 1 qui a des médicaments dans des commandes (via
+        // data.sql)
         Categorie c = categorieRepository.findById(1).orElseThrow();
-        // La catégorie avec code 1 dans le jeu de données de test a 10 médicaments
 
-        int combienDeMedicaments = c.getMedicaments().size();
-        assertEquals(10,combienDeMedicaments, "Categorie with code 1 should have 10 Medicaments");
+        // Elle doit avoir 10 médicaments (insérés par data.sql)
+        int nbMedicaments = c.getMedicaments().size();
+        assertEquals(10, nbMedicaments, "La catégorie 1 doit avoir 10 médicaments");
 
+        // On essaie de supprimer la catégorie
+        // Ca doit échouer car ses médicaments sont référencés dans des lignes de
+        // commande
         try {
             categorieRepository.delete(c);
             categorieRepository.flush();
-            fail("Should not allow deletion of Categorie if its Medicaments are referenced in Commandes");
+            fail("On ne devrait pas pouvoir supprimer une catégorie dont les médicaments sont commandés");
         } catch (DataIntegrityViolationException e) {
-            // Expected exception
+            // C'est normal, la contrainte de clé étrangère empêche la suppression
         }
     }
 }

@@ -38,7 +38,7 @@ EXPOSE 8080
 
 # Variables d'environnement par défaut
 # Sur Render, ces valeurs seront surchargées par les Environment Variables du dashboard
-ENV SPRING_PROFILES_ACTIVE=deploy
+ENV SPRING_PROFILES_ACTIVE=create
 ENV SERVER_PORT=8080
 
 # Point d'entrée (shell form pour expansion de $PORT)
