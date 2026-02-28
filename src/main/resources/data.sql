@@ -20,6 +20,7 @@ INSERT INTO CATEGORIE (CODE, LIBELLE, DESCRIPTION) VALUES
 -- On redémarre la séquence auto-increment après les insertions manuelles
 ALTER TABLE Categorie ALTER COLUMN code RESTART WITH 11;
 
+<<<<<<< HEAD
 -- -----------------------------------------------
 -- Insertion des fournisseurs (10)
 -- -----------------------------------------------
@@ -35,6 +36,20 @@ INSERT INTO FOURNISSEUR (ID, NOM, EMAIL, TELEPHONE) VALUES
 (9, 'Merck Sharp & Dohme', 'msd@pharma-afrique.com', '+221-33-800-0009'),
 (10, 'Laboratoire Médis', 'medis@medis-pharma.sn', '+221-33-800-0010');
 ALTER TABLE Fournisseur ALTER COLUMN id RESTART WITH 11;
+=======
+-- Catégorie 1: Antalgiques et Antipyrétiques
+INSERT INTO MEDICAMENT (NOM, CATEGORIE_CODE, QUANTITE_PAR_UNITE, PRIX_UNITAIRE, UNITES_EN_STOCK, UNITES_COMMANDEES, NIVEAU_DE_REAPPRO, INDISPONIBLE, imageURL) VALUES
+('Paracétamol 50000mg', 1, 'Boîte de 16 comprimés', 2.50, 500, 0, 50, false, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'),
+('Paracétamol 1000mg', 1, 'Boîte de 8 comprimés', 3.20, 350, 0, 40, false, 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400'),
+('Ibuprofène 200mg', 1, 'Boîte de 20 comprimés', 3.80, 400, 0, 45, false, 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400'),
+('Ibuprofène 400mg', 1, 'Boîte de 12 comprimés', 4.50, 320, 0, 35, false, 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400'),
+('Aspirine 500mg', 1, 'Boîte de 20 comprimés', 2.90, 450, 0, 50, false, 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400'),
+('Codéine 30mg', 1, 'Boîte de 16 comprimés', 8.90, 150, 0, 20, false, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'),
+('Tramadol 50mg', 1, 'Boîte de 20 gélules', 12.50, 180, 0, 25, false, 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400'),
+('Morphine 10mg', 1, 'Boîte de 14 comprimés', 25.80, 80, 0, 15, false, 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400'),
+('Doliprane Effervescent 1g', 1, 'Boîte de 8 comprimés', 3.50, 280, 0, 30, false, 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400'),
+('Efferalgan Vitamine C', 1, 'Boîte de 16 comprimés', 4.20, 220, 0, 25, false, 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400');
+>>>>>>> f7d5bde491383a6a6d0bd5ad18b29e30dc93c351
 
 -- -----------------------------------------------
 -- Table de jointure Categorie <-> Fournisseur
