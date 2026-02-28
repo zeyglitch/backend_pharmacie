@@ -14,7 +14,7 @@ INSERT INTO CATEGORIE (CODE, LIBELLE, DESCRIPTION) VALUES
 (8, 'Médicaments Cardiovasculaires', 'Médicaments pour le cœur et la circulation'),
 (9, 'Médicaments Gastro-intestinaux', 'Médicaments pour les troubles digestifs'),
 (10, 'Médicaments Respiratoires', 'Médicaments pour les troubles respiratoires');
-ALTER SEQUENCE categorie_code_seq RESTART WITH 11;
+ALTER TABLE CATEGORIE ALTER COLUMN CODE RESTART WITH 11;
 
 -- Insertion des fournisseurs
 INSERT INTO FOURNISSEUR (ID, NOM, EMAIL, TELEPHONE) VALUES
@@ -28,7 +28,7 @@ INSERT INTO FOURNISSEUR (ID, NOM, EMAIL, TELEPHONE) VALUES
 (8, 'GSK Sénégal', 'gsk@senegal.com', '+221-33-800-0008'),
 (9, 'Merck Sharp & Dohme', 'msd@pharma-afrique.com', '+221-33-800-0009'),
 (10, 'Laboratoire Médis', 'medis@medis-pharma.sn', '+221-33-800-0010');
-ALTER SEQUENCE fournisseur_id_seq RESTART WITH 11;
+ALTER TABLE FOURNISSEUR ALTER COLUMN ID RESTART WITH 11;
 
 -- Table de jointure Categorie <-> Fournisseur
 INSERT INTO CATEGORIE_FOURNISSEUR (CATEGORIE_CODE, FOURNISSEUR_ID) VALUES
@@ -196,7 +196,7 @@ INSERT INTO COMMANDE (NUMERO, SAISIELE, ENVOYEELE, DISPENSAIRE_CODE, PORT, REMIS
 (6, '2024-03-10', '2024-03-13', 'DSP06', 10.00, 5.50, 'Dispensaire Rufisque', '34 Avenue Blaise Diagne', '11000', 'Rufisque', 'Dakar', 'Sénégal'),
 (7, '2024-03-20', NULL, 'DSP07', 22.00, 4.50, 'Dispensaire Louga', '67 Rue Abdoulaye Wade', '50000', 'Louga', 'Louga', 'Sénégal'),
 (8, '2024-04-05', '2024-04-08', 'DSP08', 30.00, 7.00, 'Dispensaire Tambacounda', '23 Avenue Demba Diop', '23000', 'Tambacounda', 'Tambacounda', 'Sénégal');
-ALTER SEQUENCE commande_numero_seq RESTART WITH 9;
+ALTER TABLE COMMANDE ALTER COLUMN NUMERO RESTART WITH 9;
 
 -- Insertion des lignes de commande
 INSERT INTO LIGNE (COMMANDE_NUMERO, MEDICAMENT_REFERENCE, QUANTITE) VALUES
