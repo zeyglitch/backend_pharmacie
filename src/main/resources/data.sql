@@ -20,7 +20,6 @@ INSERT INTO CATEGORIE (CODE, LIBELLE, DESCRIPTION) VALUES
 -- On redémarre la séquence auto-increment après les insertions manuelles
 ALTER TABLE Categorie ALTER COLUMN code RESTART WITH 11;
 
-<<<<<<< HEAD
 -- -----------------------------------------------
 -- Insertion des fournisseurs (10)
 -- -----------------------------------------------
@@ -36,20 +35,6 @@ INSERT INTO FOURNISSEUR (ID, NOM, EMAIL, TELEPHONE) VALUES
 (9, 'Merck Sharp & Dohme', 'msd@pharma-afrique.com', '+221-33-800-0009'),
 (10, 'Laboratoire Médis', 'medis@medis-pharma.sn', '+221-33-800-0010');
 ALTER TABLE Fournisseur ALTER COLUMN id RESTART WITH 11;
-=======
--- Catégorie 1: Antalgiques et Antipyrétiques
-INSERT INTO MEDICAMENT (NOM, CATEGORIE_CODE, QUANTITE_PAR_UNITE, PRIX_UNITAIRE, UNITES_EN_STOCK, UNITES_COMMANDEES, NIVEAU_DE_REAPPRO, INDISPONIBLE, imageURL) VALUES
-('Paracétamol 50000mg', 1, 'Boîte de 16 comprimés', 2.50, 500, 0, 50, false, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'),
-('Paracétamol 1000mg', 1, 'Boîte de 8 comprimés', 3.20, 350, 0, 40, false, 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400'),
-('Ibuprofène 200mg', 1, 'Boîte de 20 comprimés', 3.80, 400, 0, 45, false, 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400'),
-('Ibuprofène 400mg', 1, 'Boîte de 12 comprimés', 4.50, 320, 0, 35, false, 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400'),
-('Aspirine 500mg', 1, 'Boîte de 20 comprimés', 2.90, 450, 0, 50, false, 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400'),
-('Codéine 30mg', 1, 'Boîte de 16 comprimés', 8.90, 150, 0, 20, false, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400'),
-('Tramadol 50mg', 1, 'Boîte de 20 gélules', 12.50, 180, 0, 25, false, 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400'),
-('Morphine 10mg', 1, 'Boîte de 14 comprimés', 25.80, 80, 0, 15, false, 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=400'),
-('Doliprane Effervescent 1g', 1, 'Boîte de 8 comprimés', 3.50, 280, 0, 30, false, 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=400'),
-('Efferalgan Vitamine C', 1, 'Boîte de 16 comprimés', 4.20, 220, 0, 25, false, 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400');
->>>>>>> f7d5bde491383a6a6d0bd5ad18b29e30dc93c351
 
 -- -----------------------------------------------
 -- Table de jointure Categorie <-> Fournisseur
@@ -203,12 +188,7 @@ INSERT INTO MEDICAMENT (NOM, CATEGORIE_CODE, QUANTITE_PAR_UNITE, PRIX_UNITAIRE, 
 ('Théophylline 200mg', 10, 'Boîte de 30 comprimés', 8.90, 150, 0, 15, false, 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400', 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400'),
 ('Prednisone 20mg', 10, 'Boîte de 20 comprimés', 3.80, 400, 0, 40, false, 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400', 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400');
 
--- -----------------------------------------------
--- Insertion des dispensaires au Sénégal (10)
--- Colonnes @Embedded AdressePostale :
---   adresse -> ADRESSE, ville -> VILLE, region -> REGION,
---   code_postal -> CODE_POSTAL, pays -> PAYS
--- -----------------------------------------------
+-- Insertion des dispensaires
 INSERT INTO DISPENSAIRE (CODE, NOM, CONTACT, FONCTION, ADRESSE, CODE_POSTAL, VILLE, REGION, PAYS, TELEPHONE, FAX) VALUES
 ('DSP01', 'Dispensaire Central Dakar', 'Dr. Amadou Diop', 'Directeur', '15 Avenue Léopold Sédar Senghor', '10200', 'Dakar', 'Dakar', 'Sénégal', '+221-33-821-5555', '+221-33-821-5556'),
 ('DSP02', 'Dispensaire Saint-Louis', 'Dr. Fatou Sall', 'Chef de Service', '42 Rue de la République', '32000', 'Saint-Louis', 'Saint-Louis', 'Sénégal', '+221-33-961-2345', '+221-33-961-2346'),
@@ -221,13 +201,7 @@ INSERT INTO DISPENSAIRE (CODE, NOM, CONTACT, FONCTION, ADRESSE, CODE_POSTAL, VIL
 ('DSP09', 'Dispensaire Kolda', 'Mme Ndeye Diagne', 'Infirmière Chef', '45 Rue de la Paix', '26000', 'Kolda', 'Kolda', 'Sénégal', '+221-33-996-5678', '+221-33-996-5679'),
 ('DSP10', 'Dispensaire Mbour', 'Dr. Abdoulaye Thiam', 'Directeur Médical', '89 Route de Saly', '22000', 'Mbour', 'Thiès', 'Sénégal', '+221-33-957-9012', '+221-33-957-9013');
 
--- -----------------------------------------------
--- Insertion des commandes (8)
--- Colonnes @Embedded AdressePostale (adresseLivraison) :
---   adresse -> ADRESSE, ville -> VILLE, region -> REGION,
---   code_postal -> CODE_POSTAL, pays -> PAYS
--- 2 commandes pas encore envoyées (envoyeele = NULL)
--- -----------------------------------------------
+-- Insertion des commandes
 INSERT INTO COMMANDE (NUMERO, SAISIELE, ENVOYEELE, DISPENSAIRE_CODE, PORT, REMISE, DESTINATAIRE, ADRESSE, CODE_POSTAL, VILLE, REGION, PAYS) VALUES
 (1, '2024-01-15', '2024-01-18', 'DSP01', 15.00, 5.00, 'Dispensaire Central Dakar', '15 Avenue Léopold Sédar Senghor', '10200', 'Dakar', 'Dakar', 'Sénégal'),
 (2, '2024-01-20', '2024-01-23', 'DSP02', 20.00, 3.50, 'Dispensaire Saint-Louis', '42 Rue de la République', '32000', 'Saint-Louis', 'Saint-Louis', 'Sénégal'),
@@ -240,12 +214,7 @@ INSERT INTO COMMANDE (NUMERO, SAISIELE, ENVOYEELE, DISPENSAIRE_CODE, PORT, REMIS
 -- On redémarre la séquence auto-increment
 ALTER TABLE Commande ALTER COLUMN numero RESTART WITH 9;
 
--- -----------------------------------------------
 -- Insertion des lignes de commande
--- Chaque commande a 5 lignes avec des médicaments variés
--- Les references correspondent aux médicaments auto-générés
--- (reference 1 à 100 dans l'ordre d'insertion)
--- -----------------------------------------------
 INSERT INTO LIGNE (COMMANDE_NUMERO, MEDICAMENT_REFERENCE, QUANTITE) VALUES
 -- Commande 1 (DSP01 - Dakar) : mélange de catégories
 (1, 1, 100),  -- Paracétamol 500mg
